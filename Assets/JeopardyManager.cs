@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections.Generic;
 
@@ -16,6 +17,9 @@ public class JeopardyManager : MonoBehaviour{
         public string teamName;
         public int score;
     }
+
+    //implement file reader for reading questions and answers
+
     string[] questionArray = new string[]
     {
     "Placeholder Question 1",
@@ -92,6 +96,7 @@ public class JeopardyManager : MonoBehaviour{
     public TMP_Text questionText;
     public TMP_Text[] teamNameTexts;
     public TMP_Text[] teamScoreTexts;
+    public TMP_Text[] buzzTeamTexts;
 
     public Button skipQuestionButton;
     public Button skipAnswerButton;
@@ -100,7 +105,7 @@ public class JeopardyManager : MonoBehaviour{
 
     public TMP_InputField[] teamInputs;
     public int numberOfTeams;
-
+    public int teamBuzzed = 0;
     private bool titleActive = true;
     private bool teamActive = false;
     private bool gameBoardActive = false;
@@ -111,6 +116,7 @@ public class JeopardyManager : MonoBehaviour{
     public List<int> askedQuestions = new List<int>();
 
     void Start(){
+        ResetBuzzNames();
         titlePanel.SetActive(true);
         scorePanel.SetActive(false);
         teamPanel.SetActive(false);
@@ -169,15 +175,6 @@ public class JeopardyManager : MonoBehaviour{
         }
     }
 
-    public void AddScore(int teamIndex, int points){
-        teams[teamIndex].score += points;
-        UpdateTeamUI(teamIndex);
-    }
-    
-    void UpdateTeamUI(int teamIndex){
-        teamScoreTexts[teamIndex].text = teams[teamIndex].score.ToString();
-    }
-
     public void StartGame(){
         teamActive = false;
         gameBoardActive = true;
@@ -203,6 +200,7 @@ public class JeopardyManager : MonoBehaviour{
 
             teams[i].teamName = "Team " + (i + 1);
             teams[i].score = 0;
+            teamScoreTexts[i].text = "score: 0";
 
             teamInputs[i].gameObject.SetActive(true);
             teamNameTexts[i].gameObject.SetActive(true);
@@ -224,28 +222,95 @@ public class JeopardyManager : MonoBehaviour{
         UpdateTeamInputs(teamCount);
     }
 
-    public void ChangeTeam1Name(string name){
+    public void ChangeTeam1Name(string name)
+    {
         teams[0].teamName = name;
         teamNameTexts[0].text = name;
+        buzzTeamTexts[0].text = name;
     }
 
-    public void ChangeTeam2Name(string name){
+    public void ChangeTeam2Name(string name)
+    {
         teams[1].teamName = name;
         teamNameTexts[1].text = name;
+        buzzTeamTexts[1].text = name;
     }
 
-    public void ChangeTeam3Name(string name){
+    public void ChangeTeam3Name(string name)
+    {
         teams[2].teamName = name;
         teamNameTexts[2].text = name;
+        buzzTeamTexts[2].text = name;
     }
 
-    public void ChangeTeam4Name(string name){
+    public void ChangeTeam4Name(string name)
+    {
         teams[3].teamName = name;
         teamNameTexts[3].text = name;
+        buzzTeamTexts[3].text = name;
     }
 
     public void UpdateTeamScore(int index, int points){
-        teams[index].score = teams[index].score + points; 
+        teams[index].score = teams[index].score + points;
+        teamScoreTexts[index].text = "Score: " + teams[index].score.ToString();
+    }
+
+    public void TeamBuzzed(int team)
+    {
+        questionActive = false;
+        buzzActive = true;
+        questionPanel.SetActive(false);
+        buzzPanel.SetActive(true);
+        buzzTeamTexts[team].gameObject.SetActive(true);
+        teamBuzzed = team;
+    }
+
+    void ResetBuzzNames() {
+        for (int i = 0; i < 4; i++) {
+            buzzTeamTexts[i].gameObject.SetActive(false);
+        }
+    }
+
+    public void QuestionRight()
+    {
+        teams[teamBuzzed].score = teams[teamBuzzed].score + currentQuestion.pointValue;
+        teamScoreTexts[teamBuzzed].text = "Score " + teams[teamBuzzed].score.ToString();
+        buzzActive = false;
+        answerActive = true;
+        buzzPanel.SetActive(false);
+        answerPanel.SetActive(true);
+        ResetBuzzNames();
+    }
+
+    public void QuestionWrong(){
+        teams[teamBuzzed].score = teams[teamBuzzed].score - currentQuestion.pointValue;
+        teamScoreTexts[teamBuzzed].text = "Score " + teams[teamBuzzed].score.ToString();
+        buzzActive = false;
+        questionActive = true;
+        buzzPanel.SetActive(false);
+        questionPanel.SetActive(true);
+        ResetBuzzNames();
+    }
+
+    void Update(){
+        if (questionActive){
+            //player 1 buzzer 
+            if (Keyboard.current.digit1Key.wasPressedThisFrame){
+                TeamBuzzed(0);
+            }
+            //player 2 buzzer 
+            if (Keyboard.current.digit2Key.wasPressedThisFrame){
+                TeamBuzzed(1);
+            }
+            //player 3 buzzer 
+            if (Keyboard.current.digit3Key.wasPressedThisFrame){
+                TeamBuzzed(2);
+            }
+            //player 4 buzzer
+            if (Keyboard.current.digit4Key.wasPressedThisFrame){
+                TeamBuzzed(3);
+            }
+        }
     }
     
 }
