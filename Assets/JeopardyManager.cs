@@ -203,12 +203,13 @@ public class JeopardyManager : MonoBehaviour
         teamActive = true;
         titlePanel.SetActive(false);
         teamPanel.SetActive(true);
+        UpdateTeamInputs(4);
     }
 
     public void UpdateTeamInputs(int teamCount)
     {
         numberOfTeams = teamCount;
-        teams = new Team[teamCount];
+        teams = new Team[4];
         for (int i = 0; i < teamCount; i++)
         {
             if (teams[i] == null)
@@ -226,10 +227,18 @@ public class JeopardyManager : MonoBehaviour
         }
 
         for (int i = teamCount; i < teamInputs.Length; i++)
-        {
+        {   
+            if (teams[i] == null)
+            {
+                teams[i] = new Team();
+            }
+            teams[i].teamName = "";
+            teamScoreTexts[i].text = "";
+            teamNameTexts[i].text = "";
             teamInputs[i].gameObject.SetActive(false);
-            teamNameTexts[i].gameObject.SetActive(false);
-            teamScoreTexts[i].gameObject.SetActive(false);
+            teamNameTexts[i].gameObject.SetActive(true);
+            teamScoreTexts[i].gameObject.SetActive(true);
+
         }
 
     }
@@ -317,28 +326,40 @@ public class JeopardyManager : MonoBehaviour
     }
 
     void Update()
-    {
+    {   
         if (questionActive)
         {
             //player 1 buzzer 
             if (Keyboard.current.digit1Key.wasPressedThisFrame)
             {
-                TeamBuzzed(0);
+                if (teamNameTexts[0].text != "")
+                {
+                    TeamBuzzed(0);
+                }    
             }
             //player 2 buzzer 
             if (Keyboard.current.digit2Key.wasPressedThisFrame)
             {
-                TeamBuzzed(1);
+                if (teamNameTexts[1].text != "")
+                {
+                    TeamBuzzed(1);
+                }    
             }
             //player 3 buzzer 
             if (Keyboard.current.digit3Key.wasPressedThisFrame)
             {
-                TeamBuzzed(2);
+                if (teamNameTexts[2].text != "")
+                {
+                    TeamBuzzed(2);
+                }    
             }
             //player 4 buzzer
             if (Keyboard.current.digit4Key.wasPressedThisFrame)
             {
-                TeamBuzzed(3);
+                if (teamNameTexts[3].text != "")
+                {
+                    TeamBuzzed(3);
+                }    
             }
         }
     }
