@@ -86,10 +86,9 @@ public class JeopardyManager : MonoBehaviour{
     public GameObject questionPanel;
     public GameObject buzzPanel;
     public GameObject answerPanel;
-    public GameObject gameBoard;
     public GameObject titlePanel;
     public GameObject teamPanel;
-    public GameObject scorePanel;
+    public GameObject categoryPanel;
 
     public TMP_Text TeamName;
     public TMP_Text answerText;
@@ -118,9 +117,8 @@ public class JeopardyManager : MonoBehaviour{
     void Start(){
         ResetBuzzNames();
         titlePanel.SetActive(true);
-        scorePanel.SetActive(false);
+        categoryPanel.SetActive(false);
         teamPanel.SetActive(false);
-        gameBoard.SetActive(false);
         questionPanel.SetActive(false);
         answerPanel.SetActive(false);
         buzzPanel.SetActive(false);
@@ -136,8 +134,7 @@ public class JeopardyManager : MonoBehaviour{
         Debug.Log("ShowQuestion called with index: " + questionIndex);
         currentQuestion = questions[questionIndex];
         askedQuestions.Add(questionIndex);
-        gameBoard.SetActive(false);
-        scorePanel.SetActive(false);
+        categoryPanel.SetActive(false);
         questionPanel.SetActive(true);
         questionText.text = currentQuestion.questionText;
         questionActive = true;
@@ -164,8 +161,7 @@ public class JeopardyManager : MonoBehaviour{
         answerActive = false;
         gameBoardActive = true;
         answerPanel.SetActive(false);
-        gameBoard.SetActive(true);
-        scorePanel.SetActive(true);
+        categoryPanel.SetActive(true);
     }
 
     void UpdateBoard(){
@@ -175,12 +171,12 @@ public class JeopardyManager : MonoBehaviour{
         }
     }
 
-    public void StartGame(){
+    public void StartGame()
+    {
         teamActive = false;
         gameBoardActive = true;
-        scorePanel.SetActive(true);
         teamPanel.SetActive(false);
-        gameBoard.SetActive(true);
+        categoryPanel.SetActive(true);   
     }
 
     public void ChooseTeams(){
