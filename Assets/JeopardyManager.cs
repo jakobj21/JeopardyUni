@@ -4,16 +4,16 @@ using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections.Generic;
 
-public class JeopardyManager : MonoBehaviour{
+public class JeopardyManager : MonoBehaviour {
     [System.Serializable]
-    public class Question{
+    public class Question {
         public string questionText;
         public int pointValue;
         public int categoryIndex;
         public string answerText;
     }
-    
-    public class Team{
+
+    public class Team {
         public string teamName;
         public int score;
     }
@@ -77,11 +77,15 @@ public class JeopardyManager : MonoBehaviour{
     "Placeholder Answer 25"
     };
 
- 
+
     public Button[] questionButton;
     public Question[] questions;
     public Question currentQuestion;
     public Team[] teams;
+
+    public GridLayoutGroup gridLayout; 
+    public Vector2 referenceResolution = new Vector2(1092, 501); 
+    public Vector2 baseCellSize = new Vector2(200, 100); 
 
     public GameObject questionPanel;
     public GameObject buzzPanel;
@@ -114,7 +118,8 @@ public class JeopardyManager : MonoBehaviour{
 
     public List<int> askedQuestions = new List<int>();
 
-    void Start(){
+    void Start() {
+        ResizeGridCells();
         ResetBuzzNames();
         titlePanel.SetActive(true);
         categoryPanel.SetActive(false);
@@ -124,13 +129,13 @@ public class JeopardyManager : MonoBehaviour{
         buzzPanel.SetActive(false);
         skipQuestionButton.onClick.AddListener(SkipQuestion);
         skipAnswerButton.onClick.AddListener(SkipAnswer);
-        for(int i = 0; i<25; i++){
+        for (int i = 0; i < 25; i++) {
             questions[i].questionText = questionArray[i];
             questions[i].answerText = answerArray[i];
         }
     }
 
-    public void ShowQuestion(int questionIndex){
+    public void ShowQuestion(int questionIndex) {
         Debug.Log("ShowQuestion called with index: " + questionIndex);
         currentQuestion = questions[questionIndex];
         askedQuestions.Add(questionIndex);
@@ -140,7 +145,7 @@ public class JeopardyManager : MonoBehaviour{
         questionActive = true;
     }
 
-    public void PlayerBuzzed(int playerNumber){
+    public void PlayerBuzzed(int playerNumber) {
         if (!questionActive) return;
         Debug.Log("Player" + playerNumber + "buzzed");
         questionActive = false;
@@ -149,14 +154,14 @@ public class JeopardyManager : MonoBehaviour{
         buzzPanel.SetActive(true);
     }
 
-    void SkipQuestion(){
+    void SkipQuestion() {
         questionActive = false;
         answerActive = true;
         questionPanel.SetActive(false);
         answerPanel.SetActive(true);
     }
 
-    void SkipAnswer(){
+    void SkipAnswer() {
         UpdateBoard();
         answerActive = false;
         gameBoardActive = true;
@@ -164,8 +169,8 @@ public class JeopardyManager : MonoBehaviour{
         categoryPanel.SetActive(true);
     }
 
-    void UpdateBoard(){
-        for(int i = 0; i < askedQuestions.Count; i++){
+    void UpdateBoard() {
+        for (int i = 0; i < askedQuestions.Count; i++) {
             questionButton[askedQuestions[i]].onClick.RemoveAllListeners();
             questionButton[askedQuestions[i]].GetComponentInChildren<TMP_Text>().text = "";
         }
@@ -176,19 +181,19 @@ public class JeopardyManager : MonoBehaviour{
         teamActive = false;
         gameBoardActive = true;
         teamPanel.SetActive(false);
-        categoryPanel.SetActive(true);   
+        categoryPanel.SetActive(true);
     }
 
-    public void ChooseTeams(){
+    public void ChooseTeams() {
         titleActive = false;
         teamActive = true;
         titlePanel.SetActive(false);
         teamPanel.SetActive(true);
     }
 
-    public void UpdateTeamInputs(int teamCount){
+    public void UpdateTeamInputs(int teamCount) {
         numberOfTeams = teamCount;
-        teams = new Team[teamCount];    
+        teams = new Team[teamCount];
         for (int i = 0; i < teamCount; i++) {
             if (teams[i] == null) {
                 teams[i] = new Team();
@@ -211,7 +216,7 @@ public class JeopardyManager : MonoBehaviour{
 
     }
 
-    public void OnDropDownChange(int index){
+    public void OnDropDownChange(int index) {
 
         Debug.Log("Index: " + index);
         int teamCount = index + 2;
@@ -246,7 +251,7 @@ public class JeopardyManager : MonoBehaviour{
         buzzTeamTexts[3].text = name;
     }
 
-    public void UpdateTeamScore(int index, int points){
+    public void UpdateTeamScore(int index, int points) {
         teams[index].score = teams[index].score + points;
         teamScoreTexts[index].text = "Score: " + teams[index].score.ToString();
     }
@@ -278,7 +283,7 @@ public class JeopardyManager : MonoBehaviour{
         ResetBuzzNames();
     }
 
-    public void QuestionWrong(){
+    public void QuestionWrong() {
         teams[teamBuzzed].score = teams[teamBuzzed].score - currentQuestion.pointValue;
         teamScoreTexts[teamBuzzed].text = "Score " + teams[teamBuzzed].score.ToString();
         buzzActive = false;
@@ -288,25 +293,34 @@ public class JeopardyManager : MonoBehaviour{
         ResetBuzzNames();
     }
 
-    void Update(){
-        if (questionActive){
+    void Update() {
+        if (questionActive) {
             //player 1 buzzer 
-            if (Keyboard.current.digit1Key.wasPressedThisFrame){
+            if (Keyboard.current.digit1Key.wasPressedThisFrame) {
                 TeamBuzzed(0);
             }
             //player 2 buzzer 
-            if (Keyboard.current.digit2Key.wasPressedThisFrame){
+            if (Keyboard.current.digit2Key.wasPressedThisFrame) {
                 TeamBuzzed(1);
             }
             //player 3 buzzer 
-            if (Keyboard.current.digit3Key.wasPressedThisFrame){
+            if (Keyboard.current.digit3Key.wasPressedThisFrame) {
                 TeamBuzzed(2);
             }
             //player 4 buzzer
-            if (Keyboard.current.digit4Key.wasPressedThisFrame){
+            if (Keyboard.current.digit4Key.wasPressedThisFrame) {
                 TeamBuzzed(3);
             }
         }
+    }
+    
+    void ResizeGridCells()
+    {
+        float widthRatio = (float)Screen.width / referenceResolution.x;
+        float heightRatio = (float)Screen.height / referenceResolution.y;
+        float scale = Mathf.Min(widthRatio, heightRatio); 
+
+        gridLayout.cellSize = new Vector2(baseCellSize.x * scale, baseCellSize.y * scale);
     }
     
 }
