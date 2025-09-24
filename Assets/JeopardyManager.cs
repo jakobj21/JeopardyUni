@@ -84,8 +84,8 @@ public class JeopardyManager : MonoBehaviour {
     public Team[] teams;
 
     public GridLayoutGroup gridLayout; 
-    public Vector2 referenceResolution = new Vector2(1092, 501); 
-    public Vector2 baseCellSize = new Vector2(200, 100); 
+    public Vector2 referenceResolution = new Vector2(1920, 1080); 
+    public Vector2 baseCellSize = new Vector2(218, 65); 
 
     public GameObject questionPanel;
     public GameObject buzzPanel;
@@ -119,7 +119,7 @@ public class JeopardyManager : MonoBehaviour {
     public List<int> askedQuestions = new List<int>();
 
     void Start() {
-        ResizeGridCells();
+        //ResizeGridCells();
         ResetBuzzNames();
         titlePanel.SetActive(true);
         categoryPanel.SetActive(false);
