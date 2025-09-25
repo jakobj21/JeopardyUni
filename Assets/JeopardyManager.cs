@@ -322,7 +322,6 @@ public class JeopardyManager : MonoBehaviour
     void Update()
     {
         if (!questionActive) return;
-            /*s
             //player 1 buzzer 
             if (Keyboard.current.digit1Key.wasPressedThisFrame)
             {
@@ -354,7 +353,7 @@ public class JeopardyManager : MonoBehaviour
                 {
                     TeamBuzzed(3);
                 }    
-            }*/
+            }
 
             //controller 1 input = 1
             //controller 2 input = 6
