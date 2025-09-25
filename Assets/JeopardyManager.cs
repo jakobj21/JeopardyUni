@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using TMPro;
 using System.Collections.Generic;
 
@@ -87,7 +88,6 @@ public class JeopardyManager : MonoBehaviour
     public Question[] questions;
     public Question currentQuestion;
     public Team[] teams;
-
     public GridLayoutGroup gridLayout;
     public Vector2 referenceResolution = new Vector2(1920, 1080);
     public Vector2 baseCellSize = new Vector2(218, 65);
@@ -122,6 +122,7 @@ public class JeopardyManager : MonoBehaviour
     private bool answerActive = false;
 
     public List<int> askedQuestions = new List<int>();
+    public List<int> alreadyBuzzed = new List<int>();
 
     void Start()
     {
@@ -153,16 +154,6 @@ public class JeopardyManager : MonoBehaviour
         questionActive = true;
     }
 
-    public void PlayerBuzzed(int playerNumber)
-    {
-        if (!questionActive) return;
-        Debug.Log("Player" + playerNumber + "buzzed");
-        questionActive = false;
-        buzzActive = true;
-        questionPanel.SetActive(false);
-        buzzPanel.SetActive(true);
-    }
-
     void SkipQuestion()
     {
         questionActive = false;
@@ -174,6 +165,7 @@ public class JeopardyManager : MonoBehaviour
     void SkipAnswer()
     {
         UpdateBoard();
+        alreadyBuzzed = new List<int>();
         answerActive = false;
         gameBoardActive = true;
         answerPanel.SetActive(false);
@@ -286,7 +278,9 @@ public class JeopardyManager : MonoBehaviour
     }
 
     public void TeamBuzzed(int team)
-    {
+    {   
+        if (alreadyBuzzed.Contains(team)) return;
+        alreadyBuzzed.Add(team);
         questionActive = false;
         buzzActive = true;
         questionPanel.SetActive(false);
@@ -326,16 +320,16 @@ public class JeopardyManager : MonoBehaviour
     }
 
     void Update()
-    {   
-        if (questionActive)
-        {
+    {
+        if (!questionActive) return;
+            /*s
             //player 1 buzzer 
             if (Keyboard.current.digit1Key.wasPressedThisFrame)
             {
                 if (teamNameTexts[0].text != "")
                 {
                     TeamBuzzed(0);
-                }    
+                }
             }
             //player 2 buzzer 
             if (Keyboard.current.digit2Key.wasPressedThisFrame)
@@ -360,9 +354,31 @@ public class JeopardyManager : MonoBehaviour
                 {
                     TeamBuzzed(3);
                 }    
+            }*/
+
+            //controller 1 input = 1
+            //controller 2 input = 6
+            //controller 3 input = 11
+            //controller 4 input = 16
+            /* check mapping
+            foreach (var joystick in Joystick.all)
+            {
+                for (int i = 0; i < joystick.allControls.Count; i++)
+                {
+                    var control = joystick.allControls[i];
+                    if (control is ButtonControl button && button.wasPressedThisFrame)
+                    {
+                        Debug.Log($"Pressed: {control.displayName} (index {i}) on {joystick.displayName}");
+                    }
+                }
             }
-        }
+            */
+        if (Input.GetKeyDown(KeyCode.Joystick1Button0)) TeamBuzzed(0); 
+        if (Input.GetKeyDown(KeyCode.Joystick1Button5)) TeamBuzzed(1); 
+        if (Input.GetKeyDown(KeyCode.Joystick1Button10)) TeamBuzzed(2); 
+        if (Input.GetKeyDown(KeyCode.Joystick1Button15)) TeamBuzzed(3);
     }
+    
 
     void ResizeGridCells()
     {
